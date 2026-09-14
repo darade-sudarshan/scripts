@@ -1,142 +1,193 @@
-# DevOps Tool Installer/Uninstaller 🚀
+# Universal Linux DevOps Tool Installer
 
-![text](https://imgur.com/tP5o7Eu.png)
+A single Bash script that installs, updates, and removes the most common DevOps tools on any major Linux distribution. It auto-detects your OS and package manager, always pulls the latest upstream release, and requires no external dependencies beyond `curl` and `bash`.
 
-**This repository provides scripts to install/uninstall a wide range of DevOps tools on both Linux and Windows operating systems. These scripts are designed to make the installation and uninstallation process seamless and straightforward, catering to the needs of DevOps engineers and enthusiasts.**
+## Supported Distributions
 
-## Features
+| Package Manager | Distributions |
+|---|---|
+| APT | Debian, Ubuntu, Mint, Kali, Pop!_OS |
+| DNF / YUM | RHEL, Fedora, Rocky, AlmaLinux, CentOS, Amazon Linux |
+| Pacman | Arch, Manjaro, EndeavourOS |
+| Zypper | openSUSE, SUSE |
+| APK | Alpine |
+| XBPS | Void Linux |
+| Portage | Gentoo |
+| EOPKG | Solus |
+| Nix | NixOS |
 
-- **User-Friendly Interface**: Interactive terminal menus for selecting installation or uninstallation actions on Windows.
-- **Multi-OS Detection**: Automatically detects your Linux distribution or Windows version and performs appropriate actions.
-- **Multi-Platform Support**: Install and uninstall DevOps tools on multiple Linux distributions (Ubuntu/Debian, CentOS/RHEL, Fedora) and Windows.
-  - Install and uninstall essential DevOps tools with a single script.
-  - Support for multiple Linux distributions: Ubuntu/Debian, CentOS/RHEL, Fedora.
-  - Support for Windows operating systems.
-  - Choose which tools to install or uninstall from a list of available options.
-  - **New Features**:
-    - Enhanced support for different Linux distributions and Windows versions.
-    - Users can select their OS before installing or uninstalling tools, streamlining the process.
+## Supported Architectures
 
-## DevOps Tools Included
+`amd64` · `arm64` · `arm`
 
-- **Comprehensive Toolset**: Support for a wide range of tools including:
-  - Docker 🐳
-  - Kubernetes (kubectl) ☸️
-  - Ansible 📜
-  - Terraform 🌍
-  - Jenkins 🏗️
-  - AWS CLI ☁️
-  - Azure CLI ☁️
-  - Google Cloud SDK ☁️
-  - Helm ⛵
-  - Prometheus 📈
-  - Grafana 📊
-  - GitLab Runner 🏃‍♂️
-  - HashiCorp Vault 🔐
-  - HashiCorp Consul 🌐
-  - Minikube ☸️
-  - Istio 📦
-  - OpenShift CLI ☸️
-  - Packer 📦
-  - Vagrant 📦
+---
 
-## Tool Preview
+## Available Tools
 
-![text](https://imgur.com/kkUnTrk.png)
+| Tool | Description |
+|---|---|
+| `common` | curl, git, jq, unzip, make, gcc, and other common utilities |
+| `docker` | Docker container engine |
+| `kubectl` | Kubernetes CLI |
+| `helm` | Kubernetes package manager |
+| `kustomize` | Kubernetes configuration customization |
+| `k9s` | Kubernetes terminal UI |
+| `kind` | Kubernetes in Docker |
+| `minikube` | Local Kubernetes cluster |
+| `eksctl` | Amazon EKS CLI |
+| `argocd` | Argo CD CLI |
+| `flux` | Flux CD CLI |
+| `kubectx` | kubectl context/namespace switcher |
+| `stern` | Multi-pod log tailing |
+| `istio` | Istio service mesh CLI (`istioctl`) |
+| `oc` | OpenShift CLI |
+| `terraform` | HashiCorp Terraform |
+| `vault` | HashiCorp Vault |
+| `consul` | HashiCorp Consul |
+| `packer` | HashiCorp Packer |
+| `ansible` | Configuration management / automation |
+| `awscli` | AWS CLI v2 |
+| `azurecli` | Azure CLI |
+| `gcloud` | Google Cloud CLI |
+| `trivy` | Container / IaC vulnerability scanner |
+| `cosign` | Container image signing and verification |
+| `sops` | Secrets encryption |
+| `jenkins` | Jenkins CI server |
+| `grafana` | Grafana monitoring and visualization |
+| `nodejs` | Node.js and npm |
+| `go` | Go programming language |
+| `java` | OpenJDK 17 |
+| `container-tools` | Podman, Buildah, Skopeo |
+
+---
+
+## Prerequisites
+
+- `curl`
+- `sudo` (or run as root)
+- `gpg` (required for Jenkins and Grafana installs)
+- `unzip` (required for Terraform, Vault, Consul, Packer, AWS CLI)
+
+---
+
+## Quick Start
+
+```bash
+# Clone or download the script
+git clone https://github.com/your-org/scripts.git
+cd scripts/DevOps-Tool-Installer
+
+# Make executable
+chmod +x install_devops_tools.sh
+
+# Launch the interactive menu
+sudo ./install_devops_tools.sh
+```
+
+---
 
 ## Usage
 
-After running the script, follow the on-screen prompts to select the tools you want to install or uninstall. The script will handle the rest based on your operating system and version.
-
-### Linux Specific
-
-- **Ubuntu/Debian**: Installs tools using `apt` package manager.
-- **CentOS/RHEL**: Installs tools using `yum` package manager.
-- **Fedora**: Installs tools using `dnf` package manager.
-
-### Windows Specific
-
-- **Chocolatey**: Utilizes `Chocolatey` package manager for installation and uninstallation of tools.
-
-## Installation Options
-
-You can install and run the DevOps Tool Installer in two ways: without cloning the repository or by cloning the repository. Choose the method that suits your needs.
-
-### Method 1: Run the Installer Without Cloning the Repository
-
-#### For Windows (PowerShell)
-
-You can run the DevOps Tool Installer on your Windows machine directly with this one-liner:
-
-```powershell
-Invoke-Expression (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/NotHarshhaa/DevOps-Tool-Installer/master/install_devops_tools.ps1')
+```
+./install_devops_tools.sh [action] [tool...]
 ```
 
-#### For Linux (Bash)
+Running with no arguments launches the interactive menu.
 
-You can run the DevOps Tool Installer on your Linux machine directly with this one-liner:
+### Actions
+
+| Action | Description |
+|---|---|
+| `install <tool...>` | Install one or more tools |
+| `install-missing` | Detect and install all missing tools interactively |
+| `uninstall <tool...>` | Remove one or more tools |
+| `update <tool...>` | Update one or more tools to the latest version |
+| `update-all` | Update system packages and all supported upstream tools |
+| `check` / `status` | Show installation status of all tools |
+| `missing` | List only tools that are not installed |
+| `list` | List all available tools with descriptions |
+| `detect` | Show detected OS, architecture, and package manager |
+| `help` / `--help` | Show usage information |
+
+---
+
+## Examples
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/NotHarshhaa/DevOps-Tool-Installer/master/install_devops_tools.sh)
+# Check the status of every supported tool
+sudo ./install_devops_tools.sh check
+
+# List only tools that are not installed
+sudo ./install_devops_tools.sh missing
+
+# Install specific tools
+sudo ./install_devops_tools.sh install docker kubectl helm terraform
+
+# Install all missing tools (prompts for confirmation)
+sudo ./install_devops_tools.sh install-missing
+
+# Update specific tools to their latest versions
+sudo ./install_devops_tools.sh update kubectl helm trivy
+
+# Update everything
+sudo ./install_devops_tools.sh update-all
+
+# Uninstall tools
+sudo ./install_devops_tools.sh uninstall terraform vault packer
+
+# Detect OS and package manager
+./install_devops_tools.sh detect
 ```
 
-### Method 2: Clone the Repository and Run the Installer
+---
 
-#### For Linux
+## Interactive Menu
 
-1. Clone the repository:
+Running the script without arguments opens a menu:
 
-    ```bash
-    git clone https://github.com/NotHarshhaa/DevOps-Tool-Installer.git
-    cd DevOps-Tool-Installer
-    ```
+```
+1) Install tools
+2) Install missing tools
+3) Uninstall tools
+4) Update tools
+5) Update all
+6) Check installation status
+7) List missing tools
+8) List all tools
+9) Detect system
+10) Exit
+```
 
-2. Make the script executable:
+---
 
-    ```bash
-    chmod +x install_devops_tools.sh
-    ```
+## Notes
 
-3. Run the script:
+### Go
+Installed to `/usr/local/go`. The script appends the following to the invoking user's `~/.bashrc` if not already present:
 
-    ```bash
-    ./install_devops_tools.sh
-    ```
+```bash
+export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
+```
 
-#### For Windows
+Source your shell or open a new terminal after installation:
+```bash
+source ~/.bashrc
+```
 
-1. Clone the repository:
+### Google Cloud CLI
+Installed to `~/google-cloud-sdk` under the invoking user's home directory. PATH is updated automatically in the user's shell rc file by the gcloud `install.sh` script.
 
-    ```powershell
-    git clone https://github.com/NotHarshhaa/DevOps-Tool-Installer.git
-    cd DevOps-Tool-Installer
-    ```
+### Jenkins
+Installs via the official Jenkins APT repository (Debian/Ubuntu only). Both the current (2025) and previous (2023) GPG signing keys are imported from `keyserver.ubuntu.com`.
 
-2. Run the script:
+### Grafana
+Installs via the official Grafana APT repository (Debian/Ubuntu only).
 
-    ```powershell
-    .\install_devops_tools.ps1
-    ```
+### Azure CLI
+Automatic installation is supported on Debian/Ubuntu only. For RHEL-family distributions, refer to the [official Azure CLI documentation](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux).
 
-## Contribution
+---
 
-Feel free to contribute to this repository by submitting a pull request or opening an issue with suggestions or bug reports. Let's make this repository a go-to resource for DevOps tool installations!
+## Binary Install Location
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Author
-
-Developed by [H A R S H H A A](https://github.com/NotHarshhaa).
-
-## Contact
-
-![Author Image](https://imgur.com/2j6Aoyl.png)
-
-> [!NOTE]
-> Join our [Telegram Community](https://t.me/prodevopsguy) for discussions and updates. Follow [ProDevOpsGuy](https://github.com/NotHarshhaa) for more DevOps content.
-
-## Hit the Star! ⭐
-
-**If you find this repository useful, please give it a star. Thanks!**
+All upstream binaries (kubectl, helm, trivy, etc.) are installed to `/usr/local/bin`.
