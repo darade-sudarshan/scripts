@@ -625,6 +625,39 @@ uninstall_docker() {
 }
 
 ###############################################################################
+# Docker Compose
+###############################################################################
+
+install_docker_compose() {
+
+    local version
+    local asset_arch
+    local plugin_dir="/usr/local/lib/docker/cli-plugins"
+    local url
+
+    case "$ARCH" in
+        amd64) asset_arch="x86_64" ;;
+        arm64) asset_arch="aarch64" ;;
+        arm) asset_arch="armv7" ;;
+    esac
+
+    version="$(github_latest_tag docker/compose)"
+    [[ -n "$version" ]] || die "Unable to determine latest Docker Compose release."
+
+    url="https://github.com/docker/compose/releases/download/${version}/docker-compose-linux-${asset_arch}"
+    download "$url" "$TMP_DIR/docker-compose"
+
+    $SUDO install -d -m 0755 "$plugin_dir"
+    $SUDO install -m 0755 "$TMP_DIR/docker-compose" "$plugin_dir/docker-compose"
+
+    success "Docker Compose $version installed."
+}
+
+uninstall_docker_compose() {
+    $SUDO rm -f /usr/local/lib/docker/cli-plugins/docker-compose
+}
+
+###############################################################################
 # Kubernetes tools
 ###############################################################################
 
@@ -1893,6 +1926,7 @@ install_common() {
 declare -a TOOLS=(
     common
     docker
+    docker-compose
     kubectl
     helm
     kustomize
@@ -1934,6 +1968,7 @@ description() {
     case "$1" in
         common)          echo "Common Linux/DevOps utilities" ;;
         docker)          echo "Docker container engine" ;;
+        docker-compose)  echo "Docker Compose plugin" ;;
         kubectl)         echo "Kubernetes CLI" ;;
         helm)            echo "Kubernetes package manager" ;;
         kustomize)       echo "Kubernetes configuration customization" ;;
@@ -1982,6 +2017,7 @@ install_tool() {
 
         common)          install_common ;;
         docker)          install_docker ;;
+        docker-compose)  install_docker_compose ;;
         kubectl)         install_kubectl ;;
         helm)            install_helm ;;
         kustomize)       install_kustomize ;;
@@ -2037,6 +2073,7 @@ uninstall_tool() {
             ;;
 
         docker)          uninstall_docker ;;
+        docker-compose)  uninstall_docker_compose ;;
         kubectl)         uninstall_kubectl ;;
         helm)            uninstall_helm ;;
         kustomize)       uninstall_kustomize ;;
@@ -2084,6 +2121,7 @@ tool_command() {
     case "$1" in
         common)          echo "git" ;;
         docker)          echo "docker" ;;
+        docker-compose)  echo "docker-compose" ;;
         kubectl)         echo "kubectl" ;;
         helm)            echo "helm" ;;
         kustomize)       echo "kustomize" ;;
@@ -2122,6 +2160,7 @@ tool_command() {
 tool_fallback_path() {
 
     case "$1" in
+        docker-compose) echo "/usr/local/lib/docker/cli-plugins/docker-compose" ;;
         go)     echo "/usr/local/go/bin/go" ;;
         gcloud)
             local real_home
@@ -2153,6 +2192,14 @@ get_tool_version() {
 
         docker)
             docker --version 2>/dev/null
+            ;;
+
+        docker-compose)
+            if command -v docker-compose >/dev/null 2>&1; then
+                docker-compose version 2>/dev/null
+            else
+                "$(tool_fallback_path docker-compose)" version 2>/dev/null
+            fi
             ;;
 
         kubectl)
@@ -2539,7 +2586,7 @@ update_tool() {
     # the latest release.
     case "$tool" in
 
-        kubectl|helm|kustomize|k9s|kind|minikube|eksctl|argocd|flux|kubectx|stern|istio|oc|terraform|vault|consul|packer|awscli|gcloud|trivy|cosign|sops|go)
+        docker-compose|kubectl|helm|kustomize|k9s|kind|minikube|eksctl|argocd|flux|kubectx|stern|istio|oc|terraform|vault|consul|packer|awscli|gcloud|trivy|cosign|sops|go)
             install_tool "$tool"
             ;;
 
@@ -2705,6 +2752,7 @@ menu() {
                 pkg_upgrade
 
                 for tool in \
+                    docker-compose \
                     kubectl \
                     helm \
                     kustomize \
@@ -2833,6 +2881,7 @@ main() {
             info "Updating DevOps tools..."
 
             for tool in \
+                docker-compose \
                 kubectl \
                 helm \
                 kustomize \

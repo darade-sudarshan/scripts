@@ -28,6 +28,7 @@ A single Bash script that installs, updates, and removes the most common DevOps 
 |---|---|
 | `common` | curl, git, jq, unzip, make, gcc, and other common utilities |
 | `docker` | Docker container engine |
+| `docker-compose` | Docker Compose v2 plugin for Docker CLI |
 | `kubectl` | Kubernetes CLI |
 | `helm` | Kubernetes package manager |
 | `kustomize` | Kubernetes configuration customization |
@@ -121,7 +122,7 @@ sudo ./install_devops_tools.sh check
 sudo ./install_devops_tools.sh missing
 
 # Install specific tools
-sudo ./install_devops_tools.sh install docker kubectl helm terraform
+sudo ./install_devops_tools.sh install docker docker-compose kubectl helm terraform
 
 # Install all missing tools (prompts for confirmation)
 sudo ./install_devops_tools.sh install-missing
